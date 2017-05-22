@@ -96,6 +96,24 @@ profile, you'd add:
 The README should explain what the profile does, how to take advantage of it,
 and how to install it.
 
+## The Model
+
+The state of the vehicle is described by its position (x, y), its orientation (psi), its velocity (v), its cross-track-error (cte) and its orientation error (epsi). There are two actuators, namely the steering angle (delta) and the acceleration (alpha). The upper and lower limits of delta were set to -25 and +25 degrees, the acceleration was limited to -1 and +1 m/s². The object motion itself can be described by the update equations 
+```
+x_(t+1) = x(t) + v(t) * cos(psi(t)) * dt
+y_(t+1) = y(t) + v(t) * sin(psi(t)) * dt
+psi_(t+1) = psi(t) + v(t) / Lf * delta(t) * dt
+v_(t+1) = v(t) + a(t) * dt
+cte(t+1) = f(x(t)) - y(t) + v(t) * sin(epsi(t)) * dt
+epsi(t+1) = psi(t) - psides(t) + v(t) * delta(t) / Lf * dt
+```
+
+## Timestep Length and Frequency
+
+## Polynomial Fitting and MPC Preprocessing
+
+## Model Predictive Control with Latency
+
 Frankly, I've never been involved in a project with multiple IDE profiles
 before. I believe the best way to handle this would be to keep them out of the
 repo root to avoid clutter. My expectation is that most profiles will include
