@@ -100,15 +100,18 @@ and how to install it.
 
 The state of the vehicle is described by its position (x, y), its orientation (psi), its velocity (v), its cross-track-error (cte) and its orientation error (epsi). There are two actuators, namely the steering angle (delta) and the acceleration (alpha). The upper and lower limits of delta were set to -25 and +25 degrees, the acceleration was limited to -1 and +1 m/s². The object motion itself can be described by the update equations 
 ```
-x_(t+1) = x(t) + v(t) * cos(psi(t)) * dt
-y_(t+1) = y(t) + v(t) * sin(psi(t)) * dt
-psi_(t+1) = psi(t) + v(t) / Lf * delta(t) * dt
-v_(t+1) = v(t) + a(t) * dt
-cte(t+1) = f(x(t)) - y(t) + v(t) * sin(epsi(t)) * dt
-epsi(t+1) = psi(t) - psides(t) + v(t) * delta(t) / Lf * dt
+x_(t+1)   = x(t)    + v(t) * cos(psi(t)) * dt
+y_(t+1)   = y(t)    + v(t) * sin(psi(t)) * dt
+psi_(t+1) = psi(t)  + v(t) / Lf * delta(t) * dt
+v_(t+1)   = v(t)    + a(t) * dt
+cte(t+1)  = f(x(t)) - y(t) + v(t) * sin(epsi(t)) * dt
+epsi(t+1) = psi(t)  - psides(t) + v(t) * delta(t) / Lf * dt
 ```
 
 ## Timestep Length and Frequency
+
+N is the number of timesteps in the horizon. dt is how much time elapses between actuations. For example, if N were 20 and dt were 0.5, then the prediction horizon T would be 10 seconds.
+A larger value for N will help foresee the future trajectory further and will contribute to smoother driving. However, the computational cost increases when the horizon is increased. Furthermore, the predicted trajectory is based on a local approximation of the actual driving path, thus it does not make much sense to plan too far into the future. On the other hand, if dt is chosen too big the discretization error of the resulting planned trajectory will increase.
 
 ## Polynomial Fitting and MPC Preprocessing
 
