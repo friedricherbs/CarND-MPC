@@ -125,7 +125,18 @@ In the end, N was chosen to be 20 and dt 0.1s which corresponds to a prediction 
 
 ## Polynomial Fitting and MPC Preprocessing
 
-A 3rd order polynomial was fitted to the coordinates representing waypoints. These waypoints are given in global coordinates so they need to be transformed to the vehicle's reference system first. After that, the current state vector is predicted to account for the delay and handed over to the actual MPC solver that calculates the optimal solution with respect to the chosen cost function. The resulting steer and acceleration values are used to update the vehicle's kinematics.
+A 3rd order polynomial was fitted to the coordinates representing waypoints. These waypoints are given in global coordinates so they need to be transformed to the vehicle's reference system first. 
+```
+for (int i = 0; i < ptsxv.size(); ++i) 
+{
+  const double x_trans = ptsx[i] - px;
+  const double y_trans = ptsy[i] - py;
+			
+  ptsxv[i] = x_trans * cos(-psi) - y_trans * sin(-psi);
+  ptsyv[i] = x_trans * sin(-psi) + y_trans * cos(-psi);
+}
+```
+After that, the current state vector is predicted to account for the delay and handed over to the actual MPC solver that calculates the optimal solution with respect to the chosen cost function. The resulting steer and acceleration values are used to update the vehicle's kinematics.
 
 ## Model Predictive Control with Latency
 
