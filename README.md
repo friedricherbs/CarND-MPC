@@ -139,4 +139,4 @@ cte_delay  = cte + v(t) * sin(epsi) * dt
 epsi_delay = epsi - v(t) * steer /Lf * dt
  ```
  
-Besides that, the choice of the cost function, especially a high weight of the deviations of the `cte` and the `epsi` was important to keep the car on the track.
+Besides that, the choice of the cost function, especially a high weight on the deviations of the `cte` and the `epsi` was important to keep the car on the track.
