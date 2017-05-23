@@ -96,6 +96,15 @@ profile, you'd add:
 The README should explain what the profile does, how to take advantage of it,
 and how to install it.
 
+Frankly, I've never been involved in a project with multiple IDE profiles
+before. I believe the best way to handle this would be to keep them out of the
+repo root to avoid clutter. My expectation is that most profiles will include
+instructions to copy files to a new location to get picked up by the IDE, but
+that's just a guess.
+
+One last note here: regardless of the IDE used, every submitted project must
+still be compilable with cmake and make./
+
 ## The Model
 
 The state of the vehicle is described by its position (x, y), its orientation (psi), its velocity (v), its cross-track-error (cte) and its orientation error (epsi). There are two actuators, namely the steering angle (delta) and the acceleration (alpha). The upper and lower limits of delta were set to -25 and +25 degrees, the acceleration was limited to -1 and +1 m/s². The object motion itself can be described by the update equations 
@@ -111,17 +120,22 @@ epsi(t+1) = psi(t)  - psides(t) + v(t) * delta(t) / Lf * dt
 ## Timestep Length and Frequency
 
 N is the number of timesteps in the horizon. dt is how much time elapses between actuations. For example, if N were 20 and dt were 0.5, then the prediction horizon T would be 10 seconds.
-A larger value for N will help foresee the future trajectory further and will contribute to smoother driving. However, the computational cost increases when the horizon is increased. Furthermore, the predicted trajectory is based on a local approximation of the actual driving path, thus it does not make much sense to plan too far into the future. On the other hand, if dt is chosen too big the discretization error of the resulting planned trajectory will increase.
+A larger value for N will help foresee the future trajectory further and will contribute to smoother driving. However, the computational cost increases when the horizon is increased. Furthermore, the predicted trajectory is based on a local approximation of the actual driving path, thus it does not make much sense to plan too far into the future. On the other hand, if dt is chosen too big the discretization error of the resulting planned trajectory will increase. 
 
 ## Polynomial Fitting and MPC Preprocessing
 
+A 3rd order polynomial was fitted to the coordinates representing waypoints. These waypoints are given in global coordinates so they need to be transformed to the vehicle's reference system first. After that, the current state vector is predicted to account for the delay and handed over to the actual MPC solver that calculates the optimal solution with respect to the chosen cost function. The resulting steer and acceleration values are used to update the vehicle's kinematics.
+
 ## Model Predictive Control with Latency
 
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
+In order to account for the delay of 100 ms, the state was predicted before it was given to the MPC solver. The prediction equations in vehicle coordinates are given by
+```
+x_delay    = v(t) * dt
+y_delay    = 0;
+psi_delay  = -v(t) * steer / Lf * dt
+v_delay    = v(t) + throttle * dt
+cte_delay  = cte + v(t) * sin(epsi) * dt
+epsi_delay = epsi - v(t) * steer /Lf * dt
+ ```
+ 
+Besides that, the choice of the cost function, especially a high weight of the deviations of the `cte` and the `epsi` was important to keep the car on the track.
