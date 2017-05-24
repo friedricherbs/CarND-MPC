@@ -137,10 +137,18 @@ for (int i = 0; i < ptsxv.size(); ++i)
 }
 ```
 After that, the current state vector is predicted to account for the delay and handed over to the actual MPC solver that calculates the optimal solution with respect to the chosen cost function. The resulting steer and acceleration values are used to update the vehicle's kinematics.
+I have started to learn optimal cost function parameters using the Twiddle algorithm. The parameter estimation can be enabled in `cfg.h` via the compile switch `ESTIMATE_PARAMS`. However, currently the reset message
+```
+// Reset simulator if one twiddle cycle is done
+std::string reset_msg = "42[\"reset\",{}]";
+ws.send(reset_msg.data(), reset_msg.length(), uWS::OpCode::TEXT);
+```
+seems to be not working any longer. I'll try to follow up on this issue.
+
 
 ## Model Predictive Control with Latency
 
-In order to account for the delay of 100 ms, the state was predicted before it was given to the MPC solver. The prediction equations in vehicle coordinates are given by
+In order to account for the delay of 100 ms, the state was predicted before it was given to the MPC solver. The prediction equations in  vehicle coordinates are given by
 ```
 x_delay    = v(t) * dt
 y_delay    = 0;
